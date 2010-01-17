@@ -2,7 +2,7 @@ require 'rubygems'
 require 'active_support'
 require 'active_record'
 require 'test/unit'
-
+require File.dirname(__FILE__) + '/../init.rb'
 
 def load_schema
   conf = YAML::load(File.open(File.dirname(__FILE__) + '/database.yml'))
