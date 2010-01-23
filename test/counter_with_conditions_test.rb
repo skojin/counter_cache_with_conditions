@@ -99,8 +99,9 @@ class CounterWithConditionsTest < Test::Unit::TestCase
 
   def test_should_increment_counter_when_unread_set_on_update
     f, m = build_fixture(:unread => false)
-    m.update_attribute :unread, true
     assert_equal 0, f.reload.unread_messages_count
+    m.update_attribute :unread, true
+    assert_equal 1, f.reload.unread_messages_count
   end
 
   def test_should_decrement_counter_when_unread_unset_on_update
@@ -108,16 +109,22 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     m.unread = false
     m.save!
     assert_equal 0, f.reload.unread_messages_count
+
+    f, m = build_fixture(:unread => true)
+    m.unread = true
+    m.save!
+    assert_equal 1, f.reload.unread_messages_count
   end
 
   def test_should_not_change_counter_when_unread_set_to_same_value_on_update
     f, m = build_fixture(:unread => true)
+    assert_equal 1, f.reload.unread_messages_count
     m.unread = true
     m.save!
-    assert_equal 0, f.reload.unread_messages_count
+    assert_equal 1, f.reload.unread_messages_count
   end
-
-  # test make folder nil, change folder
+  
+  # TODO test make folder nil, change folder, create with nil folder then assign it
 
   private
   def build_fixture(attributes = {})
