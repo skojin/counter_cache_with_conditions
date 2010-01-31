@@ -46,8 +46,8 @@ module CounterWithConditions
     def counter_with_conditions_before_destroy
       self.counter_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
         if counter_conditions_without_changes_match?(conditions)
-          association_id = send(foreign_key)
-          klass.decrement_counter(counter_name, association_id) if association_id
+          association_was = attribute_was(foreign_key.to_s)
+          klass.decrement_counter(counter_name, association_was) if association_was
         end
       end
     end
