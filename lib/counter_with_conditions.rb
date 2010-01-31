@@ -30,15 +30,15 @@ module CounterWithConditions
     
     def counter_with_conditions_before_update
       self.counter_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
-        association_id = send(foreign_key)
-        next unless association_id
-
         match_before = counter_conditions_without_changes_match?(conditions)
         match_now = counter_conditions_match?(conditions)
         if match_now && !match_before
-          klass.increment_counter(counter_name, association_id)
+          cwc_update_counter_on(klass, foreign_key, counter_name, 1, 0)
         elsif !match_now && match_before
-          klass.decrement_counter(counter_name, association_id)
+          cwc_update_counter_on(klass, foreign_key, counter_name, -1, -1)
+        elsif match_now && send("#{foreign_key}_changed?")
+          # if just association changed, decrement old, increment new
+          cwc_update_counter_on(klass, foreign_key, counter_name, 1, -1)
         end
       end
     end
@@ -63,5 +63,18 @@ module CounterWithConditions
         attribute_was(attr.to_s) == value
       end
     end
+
+    # e.g. increment counter on assotiation, and decrement it on old assotiation if assotiation was changed, and reverse
+    # @param value (+1, -1)
+    # @param value_was value for old association (if association was changed)
+    def cwc_update_counter_on(klass, foreign_key, counter_name, value, value_was = 0)
+      association_id = send(foreign_key)
+      klass.update_counters(association_id, counter_name => value) if association_id
+      if value_was != 0
+        association_was = attribute_was(foreign_key.to_s)
+        klass.update_counters(association_was, counter_name => value_was) if association_was && association_was != association_id
+      end
+    end
+
   end
 end

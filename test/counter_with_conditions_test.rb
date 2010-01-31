@@ -16,7 +16,7 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     Message.delete_all
     Folder.delete_all
   end
-
+ 
   def test_schema_has_loaded_correctly
     assert_equal [], Folder.all
     assert_equal [], Message.all
@@ -124,20 +124,20 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     assert_equal 1, f.reload.unread_messages_count
   end
 
+  # ---------- when association changed ------------
+
   def test_should_change_counter_when_unset_folder_for_unread
     f, m = build_fixture(:unread => true)
     m.folder = nil
     m.save!
     assert_equal 0, f.reload.unread_messages_count
   end
-  
   def test_should_change_counter_when_unset_folder_id_for_unread
     f, m = build_fixture(:unread => true)
     m.folder_id = nil
     m.save!
     assert_equal 0, f.reload.unread_messages_count
   end  
-
   def test_should_change_counter_when_unset_folder_and_unset_unread
     f, m = build_fixture(:unread => true)
     m.folder = nil
@@ -159,10 +159,40 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     m.unread = true
     m.save!
     assert_equal 0, f.reload.unread_messages_count
-  end  
+  end
 
+  def test_should_decrement_counter_when_association_unset_just_before_destroy
+    f, m = build_fixture(:unread => true)
+    m.folder = nil
+    m.destroy
+    assert_equal 0, f.reload.unread_messages_count
+
+    # just to be sure, dublicate test with attribute change
+    f, m = build_fixture(:unread => true)
+    m.folder = nil
+    m.unread = false
+    m.destroy
+    assert_equal 0, f.reload.unread_messages_count
+  end
+
+  def test_should_not_decrement_counter_when_association_unset_just_before_destroy
+    f, m = build_fixture(:unread => false)
+    m.folder = nil
+    m.unread = true
+    m.destroy
+    assert_equal 0, f.reload.unread_messages_count
+
+    # just to be sure, dublicate test with attribute change
+    f, m = build_fixture(:unread => false)
+    m.folder = nil
+    m.unread = true
+    m.destroy
+    assert_equal 0, f.reload.unread_messages_count
+  end
   
+
   # TODO change folder, create with nil folder then assign it, change folder and change unread
+  # TODO change folder before delete
 
   private
   def build_fixture(attributes = {})
