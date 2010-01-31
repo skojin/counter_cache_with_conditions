@@ -123,8 +123,46 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     m.save!
     assert_equal 1, f.reload.unread_messages_count
   end
+
+  def test_should_change_counter_when_unset_folder_for_unread
+    f, m = build_fixture(:unread => true)
+    m.folder = nil
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+  end
   
-  # TODO test make folder nil, change folder, create with nil folder then assign it
+  def test_should_change_counter_when_unset_folder_id_for_unread
+    f, m = build_fixture(:unread => true)
+    m.folder_id = nil
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+  end  
+
+  def test_should_change_counter_when_unset_folder_and_unset_unread
+    f, m = build_fixture(:unread => true)
+    m.folder = nil
+    m.unread = false
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+  end  
+
+  def test_should_not_change_counter_when_unset_folder_id_for_read
+    f, m = build_fixture(:unread => false)
+    m.folder_id = nil
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+  end  
+
+  def test_should_not_change_counter_when_unset_folder_set_unread
+    f, m = build_fixture(:unread => false)
+    m.folder = nil
+    m.unread = true
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+  end  
+
+  
+  # TODO change folder, create with nil folder then assign it, change folder and change unread
 
   private
   def build_fixture(attributes = {})
