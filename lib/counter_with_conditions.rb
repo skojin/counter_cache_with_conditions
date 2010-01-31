@@ -1,8 +1,8 @@
 module CounterWithConditions
-  # @param association_id extended belongs_to association
+  # @param association_name extended belongs_to association name (like :user)
   # @param counter_name name of counter cache column
   # @param conditions hash with equal conditions, like {:read => false, :source => 'message'}, no nesting
-  def counter_with_conditions(association_id, counter_name, conditions)
+  def counter_with_conditions(association_name, counter_name, conditions)
     unless is_a? InstanceMethods
       include InstanceMethods
       after_create :counter_with_conditions_after_create
@@ -13,43 +13,46 @@ module CounterWithConditions
       self.counter_with_conditions_options = []
     end
     # TODO make readonly
-    self.counter_with_conditions_options << [association_id, counter_name, conditions]
+    ref = reflect_on_association(association_name)
+    self.counter_with_conditions_options << [ref.klass, ref.association_foreign_key, counter_name, conditions]
   end
 
   module InstanceMethods
     private
     def counter_with_conditions_after_create
-      self.counter_with_conditions_options.each do |association_id, counter_name, conditions|
+      self.counter_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
         if counter_conditions_match?(conditions)
-          association = send(association_id)
-          association.class.increment_counter(counter_name, association.id) unless association.nil?
+          association_id = send(foreign_key)
+          klass.increment_counter(counter_name, association_id) if association_id
         end
       end
     end
     
     def counter_with_conditions_before_update
-      self.counter_with_conditions_options.each do |association_id, counter_name, conditions|
-        association = send(association_id)
-        next unless association
+      self.counter_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
+        association_id = send(foreign_key)
+        next unless association_id
 
         match_before = counter_conditions_without_changes_match?(conditions)
         match_now = counter_conditions_match?(conditions)
         if match_now && !match_before
-          association.class.increment_counter(counter_name, association.id)
+          klass.increment_counter(counter_name, association_id)
         elsif !match_now && match_before
-          association.class.decrement_counter(counter_name, association.id)
+          klass.decrement_counter(counter_name, association_id)
         end
       end
     end
     
     def counter_with_conditions_before_destroy
-      self.counter_with_conditions_options.each do |association_id, counter_name, conditions|
+      self.counter_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
         if counter_conditions_without_changes_match?(conditions)
-          association = send(association_id)
-          association.class.decrement_counter(counter_name, association.id) unless association.nil?
+          association_id = send(foreign_key)
+          klass.decrement_counter(counter_name, association_id) if association_id
         end
       end
     end
+
+    
     def counter_conditions_match?(conditions)
       conditions.all? do |attr, value|
         send(attr) == value
