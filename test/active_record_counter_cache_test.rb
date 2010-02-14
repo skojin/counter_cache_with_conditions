@@ -12,7 +12,7 @@ class ActiveRecordCounterCacheTest < Test::Unit::TestCase
     #belongs_to :folder, :counter_cache => true
     
     belongs_to :folder
-    counter_with_conditions :folder, :messages_count, {}
+    counter_cache_with_conditions :folder, :messages_count, {}
   end
 
   def teardown

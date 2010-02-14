@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
-class CounterWithConditionsTest < Test::Unit::TestCase 
+class CounterCacheWithConditionsTest < Test::Unit::TestCase 
   load_schema
   
   class Folder < ActiveRecord::Base
@@ -9,8 +9,8 @@ class CounterWithConditionsTest < Test::Unit::TestCase
 
   class Message < ActiveRecord::Base
     belongs_to :folder, :counter_cache => true
-    #counter_with_conditions :folder, :messages_count, {}
-    counter_with_conditions :folder, :unread_messages_count, :unread => true
+    #counter_cache_with_conditions :folder, :messages_count, {}
+    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
   end
 
   def teardown
