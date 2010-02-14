@@ -1,4 +1,2 @@
 require 'counter_with_conditions'
-ActiveRecord::Base.module_eval do
-  extend CounterWithConditions
-end
+ActiveRecord::Base.extend CounterWithConditions
