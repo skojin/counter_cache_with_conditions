@@ -3,7 +3,7 @@ module CounterWithConditions
   # @param counter_name name of counter cache column
   # @param conditions hash with equal conditions, like {:read => false, :source => 'message'}, no nesting
   def counter_with_conditions(association_name, counter_name, conditions)
-    unless is_a? InstanceMethods
+    unless ancestors.include? InstanceMethods
       include InstanceMethods
       after_create :counter_with_conditions_after_create
       before_update :counter_with_conditions_before_update

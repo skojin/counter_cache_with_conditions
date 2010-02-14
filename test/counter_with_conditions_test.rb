@@ -9,6 +9,7 @@ class CounterWithConditionsTest < Test::Unit::TestCase
 
   class Message < ActiveRecord::Base
     belongs_to :folder, :counter_cache => true
+    #counter_with_conditions :folder, :messages_count, {}
     counter_with_conditions :folder, :unread_messages_count, :unread => true
   end
 
@@ -33,30 +34,6 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     assert_equal 1, f.reload.messages_count
     m.destroy
     assert_equal 0, f.reload.messages_count
-  end
-
-  # !!!!!
-  def fail_test_default_counter_cache_not_update_counters_when_change_association_but_not_save
-    f1, m = build_fixture
-    assert_equal 1, f1.reload.messages_count
-    f2 = Folder.create
-    assert_equal 0, f2.reload.messages_count
-    m.folder = f2
-    assert_equal f1, m.reload.folder, "folder not changed"
-    assert_equal 1, f1.reload.messages_count
-    assert_equal 0, f2.reload.messages_count
-  end
-
-  # !!!!!
-  def fail_test_default_counter_cache_update_counters_when_change_association_via_id
-    f1, m = build_fixture
-    assert_equal 1, f1.reload.messages_count
-    f2 = Folder.create
-    assert_equal 0, f2.reload.messages_count
-    m.folder_id = f2.id
-    m.save
-    assert_equal 0, f1.reload.messages_count
-    assert_equal 1, f2.reload.messages_count
   end
 
   # custom counter tests
