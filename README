@@ -1,13 +1,19 @@
 Counter With Conditions
 =====================
 
-Introduction goes here.
-
+  Replacement for ActiveRecord belongs_to :counter_cache with ability to specify conditions.
 
 Example
 =======
 
-Example goes here.
+    belongs_to :folder, :counter_cache => true
+    counter_with_conditions :folder, :unread_messages_count, :unread => true
 
+  Or even as replacement for ActiveRecord counter cache, this plugin better handle some situations like 
+  change :folder via :folder_id or change :folder but unsave (e.g. validation fail), see test/active_record_counter_cache_test.rb
+    
+    belongs_to :folder
+    counter_with_conditions :folder, :messages_count, {}
+    counter_with_conditions :folder, :unread_messages_count, :unread => true
 
 Copyright (c) 2010 Sergey Kojin, released under the MIT license
