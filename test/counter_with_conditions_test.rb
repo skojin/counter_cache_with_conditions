@@ -124,7 +124,7 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     assert_equal 1, f.reload.unread_messages_count
   end
 
-  # ---------- when association changed ------------
+  # ---------- when association nillified ------------
 
   def test_should_change_counter_when_unset_folder_for_unread
     f, m = build_fixture(:unread => true)
@@ -161,7 +161,86 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     assert_equal 0, f.reload.unread_messages_count
   end
 
-  def test_should_decrement_counter_when_association_unset_just_before_destroy
+  # ---------- when association changed ------------
+
+  def test_should_not_change_counters_when_change_folder_for_read
+    f, m = build_fixture(:unread => false)
+    f2  = Folder.create!
+    m.folder = f2
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+    assert_equal 0, f2.reload.unread_messages_count
+  end
+  
+  def test_should_change_counter_when_change_folder_for_unread
+    f, m = build_fixture(:unread => true)
+    f2  = Folder.create!
+    m.folder = f2
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+    assert_equal 1, f2.reload.unread_messages_count
+  end
+  
+  def test_should_change_counter_on_old_and_skip_counter_on_new_when_change_folder_for_unread_with_status_change
+    f, m = build_fixture(:unread => true)
+    f2  = Folder.create!
+    m.folder = f2
+    m.unread = false
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+    assert_equal 0, f2.reload.unread_messages_count
+  end
+  
+  def test_should_ignore_counter_on_old_and_icrement_counter_on_new_when_change_folder_for_read_with_status_change
+    f, m = build_fixture(:unread => false)
+    f2  = Folder.create!
+    m.folder = f2
+    m.unread = true
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+    assert_equal 1, f2.reload.unread_messages_count
+  end
+  
+  # ---------- when association was nil ------------
+
+    def test_should_icrement_counter_when_assing_folder_for_unread
+    m = Message.create!(:unread => true)
+    f = Folder.create!
+    m.folder = f
+    m.save!
+    assert_equal 1, f.reload.unread_messages_count
+  end
+  
+  def test_should_ignore_counter_when_assing_folder_for_read
+    m = Message.create!(:unread => false)
+    f = Folder.create!
+    m.folder = f
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+  end
+  
+  def test_should_ignore_counter_when_assing_folder_for_unread_and_mark_as_read
+    m = Message.create!(:unread => true)
+    f = Folder.create!
+    m.folder = f
+    m.unread = false
+    m.save!
+    assert_equal 0, f.reload.unread_messages_count
+  end
+  
+  def test_should_increment_counter_when_assing_folder_for_read_and_mark_as_unread
+    m = Message.create!(:unread => false)
+    f = Folder.create!
+    m.folder = f
+    m.unread = true
+    m.save!
+    assert_equal 1, f.reload.unread_messages_count
+  end
+  
+
+  # ---------- when association changed before destroy ------------
+
+  def test_should_decrement_counter_when_association_unset_just_before_destroy_when_match
     f, m = build_fixture(:unread => true)
     m.folder = nil
     m.destroy
@@ -175,7 +254,7 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     assert_equal 0, f.reload.unread_messages_count
   end
 
-  def test_should_not_decrement_counter_when_association_unset_just_before_destroy
+  def test_should_not_decrement_counter_when_association_unset_just_before_destroy_when_not_match
     f, m = build_fixture(:unread => false)
     m.folder = nil
     m.unread = true
@@ -189,10 +268,15 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     m.destroy
     assert_equal 0, f.reload.unread_messages_count
   end
-  
 
-  # TODO change folder, create with nil folder then assign it, change folder and change unread
-  # TODO change folder before delete
+    def test_should_decrement_counter_when_association_changed_just_before_destroy_when_match
+    f, m = build_fixture(:unread => true)
+    f2 = Folder.create!
+    m.folder = f2
+    m.destroy
+    assert_equal 0, f.reload.unread_messages_count
+    assert_equal 0, f2.reload.unread_messages_count
+  end
 
   private
   def build_fixture(attributes = {})
