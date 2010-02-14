@@ -34,6 +34,9 @@ module CounterWithConditions
         match_now = counter_conditions_match?(conditions)
         if match_now && !match_before
           cwc_update_counter_on(klass, foreign_key, counter_name, 1, 0)
+        elsif !match_now && match_before && send("#{foreign_key}_changed?")
+          # decrement only old, if association changed and condition broken
+          cwc_update_counter_on(klass, foreign_key, counter_name, 0, -1)
         elsif !match_now && match_before
           cwc_update_counter_on(klass, foreign_key, counter_name, -1, -1)
         elsif match_now && send("#{foreign_key}_changed?")

@@ -180,7 +180,8 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     assert_equal 0, f.reload.unread_messages_count
     assert_equal 1, f2.reload.unread_messages_count
   end
-  
+
+  # this test is important, it fail in process
   def test_should_change_counter_on_old_and_skip_counter_on_new_when_change_folder_for_unread_with_status_change
     f, m = build_fixture(:unread => true)
     f2  = Folder.create!
@@ -269,7 +270,7 @@ class CounterWithConditionsTest < Test::Unit::TestCase
     assert_equal 0, f.reload.unread_messages_count
   end
 
-    def test_should_decrement_counter_when_association_changed_just_before_destroy_when_match
+  def test_should_decrement_counter_when_association_changed_just_before_destroy_when_match
     f, m = build_fixture(:unread => true)
     f2 = Folder.create!
     m.folder = f2
