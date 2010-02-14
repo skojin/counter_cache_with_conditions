@@ -12,8 +12,10 @@ module CounterCacheWithConditions
       cattr_accessor :counter_cache_with_conditions_options
       self.counter_cache_with_conditions_options = []
     end
+    
     # TODO make readonly
     ref = reflect_on_association(association_name)
+    ref.klass.send(:attr_readonly, counter_name.to_sym) if ref.klass.respond_to?(:attr_readonly)
     self.counter_cache_with_conditions_options << [ref.klass, ref.association_foreign_key, counter_name, conditions]
   end
 
