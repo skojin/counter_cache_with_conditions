@@ -1,4 +1,4 @@
-Counter With Conditions
+Counter Cache With Conditions
 =====================
 
   Replacement for ActiveRecord belongs_to :counter_cache with ability to specify conditions.
