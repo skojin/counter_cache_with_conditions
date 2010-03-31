@@ -1,28 +1,3 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-
-class CounterCacheWithConditionsTest < Test::Unit::TestCase 
-  load_schema
-  
-  class Folder < ActiveRecord::Base
-    has_many :messages
-  end
-
-  class Message < ActiveRecord::Base
-    belongs_to :folder, :counter_cache => true
-    #counter_cache_with_conditions :folder, :messages_count, {}
-    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
-  end
-
-  def teardown
-    Message.delete_all
-    Folder.delete_all
-  end
- 
-  def test_schema_has_loaded_correctly
-    assert_equal [], Folder.all
-    assert_equal [], Message.all
-  end
-
   # default rails counter tests
   def test_default_counter_cache_should_increment_on_create
     f, m = build_fixture
@@ -262,6 +237,3 @@ class CounterCacheWithConditionsTest < Test::Unit::TestCase
     m = f.messages.create attributes    
     [f, m]
   end
-
-end
-

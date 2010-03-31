@@ -2,7 +2,10 @@ module CounterCacheWithConditions
   # @param association_name extended belongs_to association name (like :user)
   # @param counter_name name of counter cache column
   # @param conditions hash with equal conditions, like {:read => false, :source => 'message'}, no nesting
-  def counter_cache_with_conditions(association_name, counter_name, conditions)
+  # @param conditions array with checked attributes names, in this case block is required.
+  #                   usage looks like [:read, :source], lambda{|read, source| read == false && source == 'message'}
+  # @param block proc object that take list of arguments specified in conditions parameter, should compare them and return boolean
+  def counter_cache_with_conditions(association_name, counter_name, conditions, block = nil)
     unless ancestors.include? InstanceMethods
       include InstanceMethods
       after_create :counter_cache_with_conditions_after_create
@@ -16,6 +19,7 @@ module CounterCacheWithConditions
     # TODO make readonly
     ref = reflect_on_association(association_name)
     ref.klass.send(:attr_readonly, counter_name.to_sym) if ref.klass.respond_to?(:attr_readonly)
+    conditions = [conditions, block] if conditions.is_a? Array
     self.counter_cache_with_conditions_options << [ref.klass, ref.association_foreign_key, counter_name, conditions]
   end
 
@@ -59,13 +63,19 @@ module CounterCacheWithConditions
 
     
     def counter_conditions_match?(conditions)
-      conditions.all? do |attr, value|
-        send(attr) == value
+      if conditions.is_a? Array
+        attr_names, block = conditions
+        block.call(*attr_names.map{|attr| send(attr)})
+      else
+        conditions.all?{|attr, value| send(attr) == value}
       end
     end
     def counter_conditions_without_changes_match?(conditions)
-      conditions.all? do |attr, value|
-        attribute_was(attr.to_s) == value
+      if conditions.is_a? Array
+        attr_names, block = conditions
+        block.call(*attr_names.map{|attr| attribute_was(attr.to_s)})
+      else
+        conditions.all?{|attr, value| attribute_was(attr.to_s) == value}
       end
     end
 
