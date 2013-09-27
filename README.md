@@ -1,21 +1,34 @@
-Counter Cache With Conditions
-=====================
+# Counter Cache With Conditions
 
-  Replacement for ActiveRecord belongs_to :counter_cache with ability to specify conditions.
+Replacement for ActiveRecord belongs_to :counter_cache with ability to specify conditions.
 
-Example
-=======
+## Installation
 
+Add this line to your application's Gemfile:
+
+    gem 'counter_cache_with_conditions'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install counter_cache_with_conditions
+
+## Usage
+
+When additional counter cache need
     belongs_to :folder, :counter_cache => true
     counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
 
-  Or even as replacement for ActiveRecord counter cache, this plugin better handle some situations like 
-  change :folder via :folder_id or change :folder but unsave (e.g. validation fail), see test/active_record_counter_cache_test.rb
-    
+Or as replacement for rails build in solution.
     belongs_to :folder
     counter_cache_with_conditions :folder, :messages_count, {}
     counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
     counter_cache_with_conditions :folder, :unread_messages_count, [:read, :source], lambda{|read, source| read == false && source == 'message'}
     counter_cache_with_conditions :folder, :published_events_count, [:published_at], lambda{|published_at| published_at != nil }
+
+
 
 Copyright (c) 2010 Sergey Kojin, released under the MIT license

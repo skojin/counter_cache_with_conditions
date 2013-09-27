@@ -1,2 +1,6 @@
+*.gem
+.bundle
+.DS_Store
+Gemfile.lock
+tmp
 test/debug.log
-*.marks
