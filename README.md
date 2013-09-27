@@ -19,10 +19,12 @@ Or install it yourself as:
 ## Usage
 
 When additional counter cache need
+
     belongs_to :folder, :counter_cache => true
     counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
 
 Or as replacement for rails build in solution.
+
     belongs_to :folder
     counter_cache_with_conditions :folder, :messages_count, {}
     counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
