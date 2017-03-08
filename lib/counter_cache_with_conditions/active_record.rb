@@ -22,7 +22,7 @@ module CounterCacheWithConditions
       ref = reflect_on_association(association_name)
       ref.klass.send(:attr_readonly, counter_name.to_sym) if ref.klass.respond_to?(:attr_readonly)
       conditions = [conditions, block] if conditions.is_a? Array
-      self.counter_cache_with_conditions_options << [ref.klass, ref.association_foreign_key, counter_name, conditions]
+      self.counter_cache_with_conditions_options << [ref.klass, ref.foreign_key, counter_name, conditions]
     end
 
     module InstanceMethods
