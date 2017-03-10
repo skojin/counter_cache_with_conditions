@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name          = "counter_cache_with_conditions"
-  s.version       = "0.9.1.1"
+  s.version       = "0.9.2"
   s.authors       = ["Sergey Kojin"]
   s.email         = ["sergey.kojin@gmail.com"]
   s.description   = %q{Replacement for ActiveRecord belongs_to :counter_cache with ability to specify conditions.}
