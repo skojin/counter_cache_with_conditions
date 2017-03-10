@@ -27,7 +27,7 @@ class ActiveRecordCounterCacheTest < Test::Unit::TestCase
 
   # default rails counter tests
   def test_default_counter_cache_should_increment_on_create
-    f, m = build_fixture
+    f, _ = build_fixture
     assert_equal 1, f.reload.messages_count
   end
 

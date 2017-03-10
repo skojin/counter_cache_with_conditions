@@ -1,6 +1,6 @@
   # default rails counter tests
   def test_default_counter_cache_should_increment_on_create
-    f, m = build_fixture
+    f, _ = build_fixture
     assert_equal 1, f.reload.messages_count
   end
 
@@ -14,12 +14,12 @@
   # custom counter tests
 
   def test_should_increment_counter_on_create_when_condition_match
-    f, m = build_fixture(:unread => true)
+    f, _ = build_fixture(:unread => true)
     assert_equal 1, f.reload.unread_messages_count
   end
 
   def test_should_not_increment_counter_on_create_when_condition_not_match
-    f, m = build_fixture(:unread => false)
+    f, _ = build_fixture(:unread => false)
     assert_equal 0, f.reload.unread_messages_count
   end
 
@@ -156,7 +156,7 @@
   
   # ---------- when association was nil ------------
 
-    def test_should_icrement_counter_when_assing_folder_for_unread
+  def test_should_icrement_counter_when_assing_folder_for_unread
     m = Message.create!(:unread => true)
     f = Folder.create!
     m.folder = f

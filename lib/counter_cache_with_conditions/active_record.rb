@@ -82,7 +82,7 @@ module CounterCacheWithConditions
         end
       end
 
-      # e.g. increment counter on assotiation, and decrement it on old assotiation if assotiation was changed, and reverse
+      # e.g. increment counter on association, and decrement it on old association if association was changed, and vice versa
       # @param value (+1, -1)
       # @param value_was value for old association (if association was changed)
       def ccwc_update_counter_on(klass, foreign_key, counter_name, value, value_was = 0)

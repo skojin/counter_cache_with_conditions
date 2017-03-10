@@ -1,2 +1,1 @@
 require 'counter_cache_with_conditions/active_record'
-require 'counter_cache_with_conditions/railtie'
