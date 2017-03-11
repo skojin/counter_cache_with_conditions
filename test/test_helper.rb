@@ -6,6 +6,8 @@ require "active_record"
 require "yaml"
 require "counter_cache_with_conditions"
 
+puts  "Rails #{ActiveSupport::VERSION::STRING}"
+
 if ActiveSupport::TestCase.respond_to?(:test_order=)
   ActiveSupport::TestCase.test_order = :random
 end
