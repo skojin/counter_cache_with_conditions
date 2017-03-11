@@ -9,10 +9,10 @@ class ActiveRecordCounterCacheTest < ActiveSupport::TestCase
 
   class Message < ActiveRecord::Base
     # uncomment this, and comment out lines below, too see active record counter cache error
-    #belongs_to :folder, :counter_cache => true
+    # belongs_to :folder, :counter_cache => true
     
     belongs_to :folder
-    counter_cache_with_conditions :folder, :messages_count, {}
+    counter_cache_with_conditions :folder, :messages_count
   end
 
   def teardown

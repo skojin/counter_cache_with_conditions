@@ -46,7 +46,7 @@ Or even as replacement for rails build in solution.
 ```ruby
 belongs_to :folder
 # same as rails default counter cache
-counter_cache_with_conditions :folder, :messages_count, {}
+counter_cache_with_conditions :folder, :messages_count
 ```
 
 

@@ -7,7 +7,7 @@ module CounterCacheWithConditions
     # @param conditions array with checked attributes names, in this case block is required.
     #                   usage looks like [:read, :source], lambda{|read, source| read == false && source == 'message'}
     # @param block proc object that take list of arguments specified in conditions parameter, should compare them and return boolean
-    def counter_cache_with_conditions(association_name, counter_name, conditions, block = nil)
+    def counter_cache_with_conditions(association_name, counter_name, conditions = {}, block = nil)
       unless ancestors.include? InstanceMethods
         include InstanceMethods
         after_create :counter_cache_with_conditions_after_create
