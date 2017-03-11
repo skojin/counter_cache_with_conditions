@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 
-class CounterCacheWithHashConditionsTest < Test::Unit::TestCase 
+class CounterCacheWithHashConditionsTest < ActiveSupport::TestCase
   load_schema
   class Folder < ActiveRecord::Base
     has_many :messages

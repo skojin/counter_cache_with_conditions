@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper'
 require File.dirname(__FILE__) + '/unread_messages_count_tests'
 
-class CounterCacheWithLambdaConditionsTest < Test::Unit::TestCase 
+class CounterCacheWithLambdaConditionsTest < ActiveSupport::TestCase
   load_schema
 
   class Folder < ActiveRecord::Base

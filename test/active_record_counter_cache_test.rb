@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
-class ActiveRecordCounterCacheTest < Test::Unit::TestCase 
+class ActiveRecordCounterCacheTest < ActiveSupport::TestCase
   load_schema
   
   class Folder < ActiveRecord::Base
