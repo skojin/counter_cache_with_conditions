@@ -7,33 +7,49 @@ Replacement for ActiveRecord belongs_to :counter_cache with ability to specify c
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Just include in your Gemfile:
 
     gem 'counter_cache_with_conditions'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install counter_cache_with_conditions
 
 ## Usage
 
 When additional counter cache need
 
-    belongs_to :folder, :counter_cache => true
-    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
+``` ruby
+class Message < ActiveRecord::Base
+  belongs_to :folder, :counter_cache => true # rails default counter cache
+  # hash syntax
+  # counter_cache_with_conditions :association, :association_column_name, attribute: value
+  counter_cache_with_conditions :folder, :unread_messages_count, unread: true
 
-Or as replacement for rails build in solution.
+  # lambda syntax
+  # counter_cache_with_conditions :association, :association_column_name, [:attribute], lambda{|attribute| ... }
+  # lambda syntax need [:used_attributes_array] because it need to track changes, and lambda will be called only when attributes are changed
+  counter_cache_with_conditions :folder, :unread_messages_count, [:read_at], lambda{|read_at| !read_at }
 
-    belongs_to :folder
-    counter_cache_with_conditions :folder, :messages_count, {}
-    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
-    counter_cache_with_conditions :folder, :unread_messages_count, [:read, :source], lambda{|read, source| read == false && source == 'message'}
-    counter_cache_with_conditions :folder, :published_events_count, [:published_at], lambda{|published_at| published_at != nil }
+end
+```
+
+More examples.
+
+```ruby
+# hash syntax
+counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
+counter_cache_with_conditions :folder, :archived_messages_count, status: 'archived'
+
+# lambda syntax
+counter_cache_with_conditions :folder, :unread_messages_count, [:read, :source], lambda{|read, source| read == false && source == 'message'}
+counter_cache_with_conditions :folder, :published_events_count, [:published_at], lambda{|published_at| published_at != nil }
+```
+Or even as replacement for rails build in solution.
+
+```ruby
+belongs_to :folder
+# same as rails default counter cache
+counter_cache_with_conditions :folder, :messages_count, {}
+```
 
 
+## Copyright
 
-Copyright (c) 2010 Sergey Kojin, released under the MIT license
+*Copyright (c) 2010-2017 Sergey Kojin, released under the MIT license*
