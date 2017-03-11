@@ -1,5 +1,8 @@
 # Counter Cache With Conditions
 
+[![Build Status](https://secure.travis-ci.org/thoughtbot/pacecar.png?branch=master)](http://travis-ci.org/thoughtbot/pacecar)
+
+
 Replacement for ActiveRecord belongs_to :counter_cache with ability to specify conditions.
 
 ## Installation
