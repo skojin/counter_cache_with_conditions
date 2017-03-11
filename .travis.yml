@@ -16,3 +16,7 @@ matrix:
   exclude:
     - env: RAILS='5.0.2'
       rvm: 2.0.0
+    - env: RAILS='3.2.22.5'
+      rvm: 2.2.6
+    - env: RAILS='3.2.22.5'
+      rvm: 2.4.0
