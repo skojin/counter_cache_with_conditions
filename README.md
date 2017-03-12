@@ -21,6 +21,10 @@ class Message < ActiveRecord::Base
   # hash syntax
   # counter_cache_with_conditions :association, :association_column_name, attribute: value
   counter_cache_with_conditions :folder, :unread_messages_count, unread: true
+  # in hash style, true value mean !!attribute, any non nil and false value
+  counter_cache_with_conditions :folder, :read_messages_count, read_at: true
+  # but false still mean attribute == false
+  counter_cache_with_conditions :folder, :unread_messages_count, read_at: nil
 
   # lambda syntax
   # counter_cache_with_conditions :association, :association_column_name, [:attribute], lambda{|attribute| ... }
@@ -36,6 +40,8 @@ More examples.
 # hash syntax
 counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
 counter_cache_with_conditions :folder, :archived_messages_count, status: 'archived'
+# hash can have multi attributes to check
+counter_cache_with_conditions :folder, :unread_messages_count, :unread => true, source: 'message'
 
 # lambda syntax
 counter_cache_with_conditions :folder, :unread_messages_count, [:read, :source], lambda{|read, source| read == false && source == 'message'}

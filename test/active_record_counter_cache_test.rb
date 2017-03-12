@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
+# no condition, same behavior as rails build in counter cache
 class ActiveRecordCounterCacheTest < ActiveSupport::TestCase
   load_schema
   

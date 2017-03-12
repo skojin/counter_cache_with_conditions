@@ -1,18 +1,16 @@
 require File.dirname(__FILE__) + '/test_helper'
-require File.dirname(__FILE__) + '/unread_messages_count_tests'
 
-class CounterCacheWithLambdaConditionsTest < ActiveSupport::TestCase
+
+class SimpleHashConditionsTest < ActiveSupport::TestCase
   load_schema
-
   class Folder < ActiveRecord::Base
     has_many :messages
   end
 
   class Message < ActiveRecord::Base
     belongs_to :folder, :counter_cache => true
-    counter_cache_with_conditions :folder, :unread_messages_count, [:unread], lambda{|unread| unread == true}
+    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
   end
-
   
   def teardown
     Message.delete_all

@@ -65,20 +65,22 @@ module CounterCacheWithConditions
 
 
       def counter_conditions_match?(conditions)
-        if conditions.is_a? Array
+        if conditions.is_a? Array # lambda
           attr_names, block = conditions
           block.call(*attr_names.map { |attr| send(attr) })
-        else
-          conditions.all? { |attr, value| send(attr) == value }
+        else # hash
+          # true is not strict like !!value
+          conditions.all? { |attr, value| value == true ? send(attr) : send(attr) == value }
         end
       end
 
       def counter_conditions_without_changes_match?(conditions)
-        if conditions.is_a? Array
+        if conditions.is_a? Array # lambda
           attr_names, block = conditions
           block.call(*attr_names.map { |attr| attribute_was(attr.to_s) })
-        else
-          conditions.all? { |attr, value| attribute_was(attr.to_s) == value }
+        else # hash
+          # true is not strict like !!value
+          conditions.all? { |attr, value| value == true ? attribute_was(attr.to_s) : attribute_was(attr.to_s) == value }
         end
       end
 
