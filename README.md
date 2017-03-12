@@ -50,6 +50,12 @@ counter_cache_with_conditions :folder, :messages_count
 ```
 
 
+
+## See Also
+
+* https://github.com/magnusvk/counter_culture
+* https://github.com/r7kamura/conditional_counter_cache
+
 ## Copyright
 
 *Copyright (c) 2010-2017 Sergey Kojin, released under the MIT license*
