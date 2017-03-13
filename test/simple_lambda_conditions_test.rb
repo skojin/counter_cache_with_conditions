@@ -9,7 +9,7 @@ class SimpleLambdaConditionsTest < ActiveSupport::TestCase
 
   class Message < ActiveRecord::Base
     belongs_to :folder, :counter_cache => true
-    counter_cache_with_conditions :folder, :unread_messages_count, [:unread], lambda{|unread| unread == true}
+    counter_cache_with_conditions :folder, :unread_messages_count, lambda{|unread| unread == true}
   end
 
   

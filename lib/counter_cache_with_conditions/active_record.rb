@@ -3,10 +3,10 @@ module CounterCacheWithConditions
 
     # @param association_name extended belongs_to association name (like :user)
     # @param counter_name name of counter cache column
-    # @param conditions hash with equal conditions, like {:read => false, :source => 'message'}, no nesting
-    # @param conditions array with checked attributes names, in this case block is required.
-    #                   usage looks like [:read, :source], lambda{|read, source| read == false && source == 'message'}
+    # @param conditions hash with equal conditions, like {:read => true, :source => 'message'}, no nesting
     # @param block proc object that take list of arguments specified in conditions parameter, should compare them and return boolean
+    #                   usage looks like lambda{|read, source| read == true && source == 'message'}
+    #                   lambda parameter should match to this record attributes that need to check for change
     def counter_cache_with_conditions(association_name, counter_name, conditions = {}, block = nil)
       unless ancestors.include? InstanceMethods
         include InstanceMethods
@@ -21,7 +21,9 @@ module CounterCacheWithConditions
       # TODO make readonly
       ref = reflect_on_association(association_name)
       ref.klass.send(:attr_readonly, counter_name.to_sym) if ref.klass.respond_to?(:attr_readonly)
-      conditions = [conditions, block] if conditions.is_a? Array
+      if conditions.is_a? Proc
+        conditions = [conditions.parameters.map{|_, name| name.to_s}, conditions]
+      end
       self.counter_cache_with_conditions_options << [ref.klass, ref.foreign_key, counter_name, conditions]
     end
 
@@ -77,7 +79,7 @@ module CounterCacheWithConditions
       def counter_conditions_without_changes_match?(conditions)
         if conditions.is_a? Array # lambda
           attr_names, block = conditions
-          block.call(*attr_names.map { |attr| attribute_was(attr.to_s) })
+          block.call(*attr_names.map { |attr| attribute_was(attr) })
         else # hash
           # true is not strict like !!value
           conditions.all? { |attr, value| value == true ? attribute_was(attr.to_s) : attribute_was(attr.to_s) == value }

@@ -9,7 +9,9 @@ Replacement for ActiveRecord belongs_to :counter_cache with ability to specify c
 
 Just include in your Gemfile:
 
-    gem 'counter_cache_with_conditions'
+```ruby
+gem 'counter_cache_with_conditions'
+```
 
 ## Usage
 
@@ -21,15 +23,15 @@ class Message < ActiveRecord::Base
   # hash syntax
   # counter_cache_with_conditions :association, :association_column_name, attribute: value
   counter_cache_with_conditions :folder, :unread_messages_count, unread: true
-  # in hash style, true value mean !!attribute, any non nil and false value
+  # in hash style, true value mean !!attribute, same as if(attribute)
   counter_cache_with_conditions :folder, :read_messages_count, read_at: true
-  # but false still mean attribute == false
+  # but false still mean strict if(attribute == false)
   counter_cache_with_conditions :folder, :unread_messages_count, read_at: nil
 
   # lambda syntax
-  # counter_cache_with_conditions :association, :association_column_name, [:attribute], lambda{|attribute| ... }
-  # lambda syntax need [:used_attributes_array] because it need to track changes, and lambda will be called only when attributes are changed
-  counter_cache_with_conditions :folder, :unread_messages_count, [:read_at], lambda{|read_at| !read_at }
+  # counter_cache_with_conditions :association, :association_column_name, lambda{|attribute| ... }
+  # lambda parameter names should be same as this record attribute name, because it need to compare with attributes before change
+  counter_cache_with_conditions :folder, :positive_messages_count, lambda{|rating| rating > 3 }
 
 end
 ```
@@ -44,10 +46,10 @@ counter_cache_with_conditions :folder, :archived_messages_count, status: 'archiv
 counter_cache_with_conditions :folder, :unread_messages_count, :unread => true, source: 'message'
 
 # lambda syntax
-counter_cache_with_conditions :folder, :unread_messages_count, [:read, :source], lambda{|read, source| read == false && source == 'message'}
-counter_cache_with_conditions :folder, :published_events_count, [:published_at], lambda{|published_at| published_at != nil }
+counter_cache_with_conditions :folder, :unread_messages_count, lambda{|read, source| read == false && source == 'message'}
+counter_cache_with_conditions :folder, :published_events_count, ->(published_at){ published_at != nil }
 ```
-Or even as replacement for rails build in solution.
+Or even as replacement for rails build in solution. Because it works better then rails counter cache when need to move item between parent records (change :folder is this code sample)
 
 ```ruby
 belongs_to :folder
