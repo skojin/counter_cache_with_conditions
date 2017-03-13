@@ -29,16 +29,16 @@ module CounterCacheWithConditions
     module InstanceMethods
       private
       def counter_cache_with_conditions_after_create
-        self.counter_cache_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
+        build_counter_cache_updates do |klass, foreign_key, counter_name, conditions|
           if counter_conditions_match?(conditions)
             association_id = send(foreign_key)
-            klass.increment_counter(counter_name, association_id) if association_id
+            [[association_id, 1]] if association_id
           end
         end
       end
 
       def counter_cache_with_conditions_before_update
-        self.counter_cache_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
+        build_counter_cache_updates do |klass, foreign_key, counter_name, conditions|
           match_before = counter_conditions_without_changes_match?(conditions)
           match_now = counter_conditions_match?(conditions)
           if match_now && !match_before
@@ -56,11 +56,27 @@ module CounterCacheWithConditions
       end
 
       def counter_cache_with_conditions_before_destroy
-        self.counter_cache_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
+        build_counter_cache_updates do |klass, foreign_key, counter_name, conditions|
           if counter_conditions_without_changes_match?(conditions)
             association_was = attribute_was(foreign_key.to_s)
-            klass.decrement_counter(counter_name, association_was) if association_was
+            [[association_was, -1]] if association_was
           end
+        end
+      end
+
+      # block should return [[association_id, value_diff], ..]
+      def build_counter_cache_updates # &block(foreign_key, conditions, updates)
+        updates_by_assoc = Hash.new { |hash, key| hash[key] = {} } # {[klass, association_id] => {column => diff}}
+        self.counter_cache_with_conditions_options.each do |klass, foreign_key, counter_name, conditions|
+          updates = yield(klass, foreign_key, counter_name, conditions)
+          # group updated by association_id
+          updates && updates.each do |association_id, value_diff|
+            updates_by_assoc[[klass, association_id]][counter_name] = value_diff
+          end
+        end
+        # update DB
+        updates_by_assoc.each do |(klass, association_id), counters|
+          klass.update_counters(association_id, counters)
         end
       end
 
@@ -89,12 +105,16 @@ module CounterCacheWithConditions
       # @param value_was (0, -1) value for old association (if association was changed)
       def ccwc_update_counter_on(klass, foreign_key, counter_name, value, value_was = 0)
         association_id = send(foreign_key)
-        klass.update_counters(association_id, counter_name => value) if association_id
+        updates = []
+        updates << [association_id, value] if association_id
         if value_was != 0
           # record was moved to another parent node, so we need to decrement counter on old parent node
           association_was = attribute_was(foreign_key.to_s)
-          klass.update_counters(association_was, counter_name => value_was) if association_was && association_was != association_id
+          if association_was && association_was != association_id
+            updates << [association_was, value_was]
+          end
         end
+        updates
       end
 
     end
