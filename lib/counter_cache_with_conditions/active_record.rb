@@ -18,7 +18,6 @@ module CounterCacheWithConditions
         self.counter_cache_with_conditions_options = []
       end
 
-      # TODO make readonly
       ref = reflect_on_association(association_name)
       ref.klass.send(:attr_readonly, counter_name.to_sym) if ref.klass.respond_to?(:attr_readonly)
       if conditions.is_a? Proc
@@ -65,7 +64,6 @@ module CounterCacheWithConditions
         end
       end
 
-
       def counter_conditions_match?(conditions)
         if conditions.is_a? Array # lambda
           attr_names, block = conditions
@@ -87,12 +85,13 @@ module CounterCacheWithConditions
       end
 
       # e.g. increment counter on association, and decrement it on old association if association was changed, and vice versa
-      # @param value (+1, -1)
-      # @param value_was value for old association (if association was changed)
+      # @param value (+1, 0, -1) value diff
+      # @param value_was (0, -1) value for old association (if association was changed)
       def ccwc_update_counter_on(klass, foreign_key, counter_name, value, value_was = 0)
         association_id = send(foreign_key)
         klass.update_counters(association_id, counter_name => value) if association_id
         if value_was != 0
+          # record was moved to another parent node, so we need to decrement counter on old parent node
           association_was = attribute_was(foreign_key.to_s)
           klass.update_counters(association_was, counter_name => value_was) if association_was && association_was != association_id
         end
