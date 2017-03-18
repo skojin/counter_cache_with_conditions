@@ -55,6 +55,9 @@ counter_cache_with_conditions :folder, :messages_count
 
 * https://github.com/magnusvk/counter_culture
 * https://github.com/r7kamura/conditional_counter_cache
+* https://github.com/cedric/custom_counter_cache
+* https://github.com/wanelo/counter-cache
+* https://github.com/iguchi1124/counter_cache-rails
 
 ## Copyright
 
