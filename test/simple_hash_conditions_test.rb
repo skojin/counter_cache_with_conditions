@@ -9,7 +9,7 @@ class SimpleHashConditionsTest < ActiveSupport::TestCase
 
   class Message < ActiveRecord::Base
     belongs_to :folder, :counter_cache => true
-    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
+    counter_cache :folder, :unread_messages_count, :unread => true
   end
   
   def teardown

@@ -7,7 +7,7 @@ module CounterCacheWithConditions
     # @param block proc object that take list of arguments specified in conditions parameter, should compare them and return boolean
     #                   usage looks like lambda{|read, source| read == true && source == 'message'}
     #                   lambda parameter should match to this record attributes that need to check for change
-    def counter_cache_with_conditions(association_name, counter_name, conditions = {}, block = nil)
+    def counter_cache(association_name, counter_name, conditions = {}, block = nil)
       unless ancestors.include? InstanceMethods
         include InstanceMethods
         after_create :counter_cache_with_conditions_after_create

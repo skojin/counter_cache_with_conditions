@@ -13,14 +13,14 @@ class ComplexHashConditionsTest < ActiveSupport::TestCase
   end
 
   class MessageClickedAt < Message
-    counter_cache_with_conditions :folder, :clicked_messages_count, :clicked_at => true
+    counter_cache :folder, :clicked_messages_count, :clicked_at => true
   end
   class MessageMulti < Message
-    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true, :status => 'active'
+    counter_cache :folder, :unread_messages_count, :unread => true, :status => 'active'
   end
   class MessageTwoCounter < Message
-    counter_cache_with_conditions :folder, :unread_messages_count, :unread => true
-    counter_cache_with_conditions :folder, :clicked_messages_count, :clicked_at => true
+    counter_cache :folder, :unread_messages_count, :unread => true
+    counter_cache :folder, :clicked_messages_count, :clicked_at => true
   end
 
   def test_created_at_on_to_off
